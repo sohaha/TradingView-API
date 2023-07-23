@@ -4,6 +4,8 @@ const TradingView = require('../main');
   This example creates a BTCEUR daily chart
 */
 
+TradingView.setReverseProxy(process.argv[2])
+
 const client = new TradingView.Client(); // Creates a websocket client
 
 const chart = new client.Session.Chart(); // Init a Chart session

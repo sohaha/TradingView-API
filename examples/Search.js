@@ -6,6 +6,8 @@ const TradingView = require('../main');
   and 'searchIndicator'
 */
 
+TradingView.setReverseProxy(process.argv[2])
+
 TradingView.searchMarket('BINANCE:').then((rs) => {
   console.log('Found Markets:', rs);
 });

@@ -11,7 +11,9 @@ const indicators = ['Recommend.Other', 'Recommend.All', 'Recommend.MA']
 const builtInIndicList = []
 
 async function fetchScanData(tickers = [], type = '', columns = []) {
-  let { data } = await request({
+  const reverseProxy = proxy.reverseProxy()
+
+  const o = {
     method: 'POST',
     hostname: 'scanner.tradingview.com',
     path: `/${type}/scan`,
@@ -19,7 +21,16 @@ async function fetchScanData(tickers = [], type = '', columns = []) {
       'Content-Type': 'application/json',
     },
     agent: proxy(),
-  }, true, JSON.stringify({ symbols: { tickers }, columns }))
+  }
+
+  if (reverseProxy) {
+    o.headers = { ...o.headers || {}, 'proxy-url': "https://" + (o.host ? o.host : o.hostname) + o.path }
+    o.hostname = ""
+    o.host = reverseProxy
+    o.path = ""
+  }
+
+  let { data } = await request(o, true, JSON.stringify({ symbols: { tickers }, columns }))
 
   if (!data.startsWith('{')) throw new Error('Wrong screener or symbol')
 
@@ -411,10 +422,18 @@ module.exports = {
    */
   async getUser(session, signature = '', location = 'https://www.tradingview.com/') {
     return new Promise((cb, err) => {
-      https.get(location, {
+      const o = {
         headers: { cookie: `sessionid=${session}${signature ? `;sessionid_sign=${signature};` : ''}` },
         agent: proxy(),
-      }, (res) => {
+      }
+
+      const reverseProxy = proxy.reverseProxy()
+      if (reverseProxy) {
+        o.headers["proxy-url"] = location
+        location = "https://" + reverseProxy
+      }
+
+      https.get(location, o, (res) => {
         let rs = ''
         res.on('data', (d) => { rs += d })
         res.on('end', async () => {
@@ -459,10 +478,19 @@ module.exports = {
    */
   async getPrivateIndicators(session, signature = '') {
     return new Promise((cb, err) => {
-      https.get('https://pine-facade.tradingview.com/pine-facade/list?filter=saved', {
+      const o = {
         headers: { cookie: `sessionid=${session}${signature ? `;sessionid_sign=${signature};` : ''}` },
         agent: proxy(),
-      }, (res) => {
+      }
+
+      let location = 'https://pine-facade.tradingview.com/pine-facade/list?filter=saved'
+      const reverseProxy = proxy.reverseProxy()
+      if (reverseProxy) {
+        o.headers["proxy-url"] = location
+        location = "https://" + reverseProxy
+      }
+
+      https.get(location, o, (res) => {
         let rs = ''
         res.on('data', (d) => { rs += d })
         res.on('end', async () => {

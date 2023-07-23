@@ -227,10 +227,21 @@ module.exports = class Client {
     if (clientOptions.DEBUG) global.TW_DEBUG = clientOptions.DEBUG
 
     const server = clientOptions.server || 'data'
-    this.#ws = new WebSocket(`wss://${server}.tradingview.com/socket.io/websocket?&type=chart`, {
+    let url = `wss://${server}.tradingview.com/socket.io/websocket?&type=chart`
+    const options =  {
       origin: 'https://s.tradingview.com',
       agent: proxy(),
-    })
+    }
+
+    const reverseProxy = proxy.reverseProxy()
+    if(reverseProxy){
+      options.headers = {
+        "proxy-url":url,
+      }
+      url = `wss://${reverseProxy}`
+    }
+
+    this.#ws = new WebSocket(url, options)
 
     if (clientOptions.token) {
       misc.getUser(

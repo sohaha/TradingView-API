@@ -5,6 +5,7 @@ const TradingView = require('../main');
   like volume-based indicators
 */
 
+
 const volumeProfile = new TradingView.BuiltInIndicator('VbPFixed@tv-basicstudies-139!');
 
 if (!process.argv[2] && !['VbPFixed@tv-basicstudies-139!', 'Volume@tv-basicstudies-144'].includes(volumeProfile.type)) {

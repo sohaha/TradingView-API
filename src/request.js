@@ -9,7 +9,16 @@ const proxy = require('./proxy')
  */
 function request(options = {}, raw = false, content = '') {
   return new Promise((cb, err) => {
-    const req = https.request({ agent: proxy(), ...options }, (res) => {
+    const reverseProxy = proxy.reverseProxy()
+    const o = { agent: proxy(), ...options }
+    if(reverseProxy){
+      o.headers = {...o.headers||{},'proxy-url':"https://"+(o.host?o.host:o.hostname)+o.path}
+      o.hostname = ""
+      o.host = reverseProxy
+      o.path = ""
+    }
+    
+    const req = https.request(o, (res) => {
       let data = ''
       res.on('data', (c) => { data += c })
       res.on('end', () => {
