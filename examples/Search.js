@@ -1,4 +1,4 @@
-const TradingView = require('../main');
+const TradingView = require('../main')
 
 /*
   This example tests the searching
@@ -6,12 +6,12 @@ const TradingView = require('../main');
   and 'searchIndicator'
 */
 
-TradingView.setReverseProxy(process.argv[2])
+TradingView.SetReverseProxy(process.argv[2])
 
 TradingView.searchMarket('BINANCE:').then((rs) => {
-  console.log('Found Markets:', rs);
-});
+  console.log('Found Markets:', rs)
+})
 
 TradingView.searchIndicator('RSI').then((rs) => {
-  console.log('Found Indicators:', rs);
-});
+  console.log('Found Indicators:', rs)
+})

@@ -1,4 +1,5 @@
 node_modules/
 .github/
+examples/
 package-lock.json
 .env
